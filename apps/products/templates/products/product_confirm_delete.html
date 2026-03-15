@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar {{ product.name }} — ShopDemo{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav class="flex mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center space-x-1 md:space-x-2">
+    <li>
+      <a href="{% url 'products:product_list' %}" class="hover:text-blue-600 transition-colors">Productos</a>
+    </li>
+    <li class="flex items-center">
+      <svg class="w-3 h-3 mx-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <a href="{% url 'products:product_detail' product.pk %}" class="hover:text-blue-600 transition-colors truncate max-w-xs">{{ product.name }}</a>
+    </li>
+    <li class="flex items-center">
+      <svg class="w-3 h-3 mx-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="text-red-600 font-medium">Eliminar</span>
+    </li>
+  </ol>
+</nav>
+
+<div class="max-w-lg">
+  <div class="bg-white border border-red-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="h-1.5 w-full bg-gradient-to-r from-red-400 to-rose-500"></div>
+
+    <div class="p-8">
+      <!-- Icon + title -->
+      <div class="flex items-start gap-4 mb-6">
+        <div class="shrink-0 w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold text-gray-900 mb-1">¿Eliminar producto?</h1>
+          <p class="text-sm text-gray-500">Esta acción no se puede deshacer.</p>
+        </div>
+      </div>
+
+      <!-- Product summary card -->
+      <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
+        <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold mb-2">Producto a eliminar</p>
+        <p class="font-bold text-gray-900 text-base mb-1">{{ product.name }}</p>
+        <p class="text-sm text-gray-500 line-clamp-2 mb-3">{{ product.description }}</p>
+        <div class="flex items-center gap-4 text-sm">
+          <span class="font-semibold text-gray-700">${{ product.price }}</span>
+          <span class="text-gray-400">·</span>
+          <span class="text-gray-500">{{ product.stock }} en stock</span>
+          <span class="text-gray-400">·</span>
+          <span class="text-gray-500">{{ product.owner }}</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <form method="post">
+        {% csrf_token %}
+        <div class="flex items-center gap-3">
+          <button type="submit"
+            class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-lg
+                   text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300
+                   transition-all duration-200 shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Sí, eliminar
+          </button>
+          <a href="{% url 'products:product_detail' product.pk %}"
+            class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg
+                   text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all duration-200">
+            Cancelar
+          </a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
