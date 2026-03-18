@@ -22,3 +22,4 @@ local_settings.py
 *.swo
 Thumbs.db
 Desktop.ini
+theme/static/css/dist/styles.css

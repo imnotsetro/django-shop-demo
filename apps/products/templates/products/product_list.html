@@ -40,9 +40,25 @@
   </div>
 {% endif %}
 
-<section class="bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-12">
+<section class="flex-1 bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-12">
   <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
-    <!-- Heading & Filters -->
+
+    <!-- Header de sección -->
+    <div class="mb-6 flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Productos</h1>
+      {% if request.user.is_authenticated %}
+        <a
+          href="{% url 'products:product_create' %}"
+          class="inline-flex items-center gap-2 rounded-lg bg-primary-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        >
+          <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5v14"/>
+          </svg>
+          Nuevo producto
+        </a>
+      {% endif %}
+    </div>
+
     {% if page_obj.object_list %}
     <div class="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
       {% for product in page_obj %}
@@ -119,10 +135,17 @@
       </svg>
       <h3 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white">No hay productos disponibles</h3>
       <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">Todavía no se han agregado productos al catálogo.</p>
-      <a href="{% url 'products:product_create' %}"
-         class="inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-        Agregar primer producto
-      </a>
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'products:product_create' %}"
+           class="inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+          Agregar primer producto
+        </a>
+      {% else %}
+        <a href="{% url 'accounts:login' %}?next={% url 'products:product_create' %}"
+           class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+          Iniciá sesión para agregar productos
+        </a>
+      {% endif %}
     </div>
     {% endif %}
 
