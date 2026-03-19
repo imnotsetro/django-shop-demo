@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Orden #{{ order.pk }} confirmada — ShopDemo{% endblock %}
+
+{% block content %}
+
+<section class="flex-1 bg-gray-50 py-12 antialiased dark:bg-gray-900 px-4">
+  <div class="mx-auto max-w-2xl">
+
+    <!-- Confirmation banner -->
+    <div class="mb-8 flex flex-col items-center text-center">
+      <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+        <svg class="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">¡Compra confirmada!</h1>
+      <p class="mt-1 text-gray-500 dark:text-gray-400">Tu orden <span class="font-semibold text-gray-700 dark:text-gray-300">#{{ order.pk }}</span> fue procesada exitosamente.</p>
+    </div>
+
+    <!-- Order card -->
+    <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 overflow-hidden">
+      <div class="h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
+      <div class="p-6 space-y-6">
+
+        <!-- Product summary -->
+        <div>
+          <p class="text-xs uppercase tracking-wide font-semibold text-gray-400 dark:text-gray-500 mb-3">Producto comprado</p>
+          <div class="flex items-center gap-4">
+            {% if order.product and order.product.image %}
+              <img src="{{ order.product.image.url }}" alt="{{ order.product_name }}" class="h-16 w-16 rounded-lg object-contain border border-gray-200 bg-white dark:border-gray-600">
+            {% else %}
+              <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
+                <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16l4-4 4 4 4-6 4 6M3 8h.01M21 3H3a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1Z"/>
+                </svg>
+              </div>
+            {% endif %}
+            <div>
+              <p class="font-semibold text-gray-900 dark:text-white">{{ order.product_name }}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Cantidad: {{ order.quantity }}</p>
+              <p class="text-sm font-bold text-gray-900 dark:text-white">${{ order.total_price }}</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-gray-200 dark:border-gray-700">
+
+        <!-- Delivery info -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs uppercase tracking-wide font-semibold text-gray-400 dark:text-gray-500 mb-2">Datos de entrega</p>
+            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ order.full_name }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ order.email }}</p>
+            {% if order.phone %}<p class="text-sm text-gray-500 dark:text-gray-400">{{ order.phone }}</p>{% endif %}
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ order.city }}, {{ order.country }}</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-wide font-semibold text-gray-400 dark:text-gray-500 mb-2">Detalle de la orden</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Fecha: <span class="font-medium text-gray-700 dark:text-gray-300">{{ order.created_at|date:"d/m/Y H:i" }}</span></p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Estado:
+              <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                {{ order.get_status_display }}
+              </span>
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Total pagado: <span class="font-bold text-gray-900 dark:text-white">${{ order.total_price }}</span></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 flex flex-col sm:flex-row gap-3">
+      <a
+        href="{% url 'orders:order_history' %}"
+        class="flex-1 flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700
+               hover:bg-gray-50 hover:text-primary-700 focus:outline-none focus:ring-4 focus:ring-gray-100
+               dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+      >
+        Ver historial de compras
+      </a>
+      <a
+        href="{% url 'products:product_list' %}"
+        class="flex-1 flex items-center justify-center gap-2 rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-semibold text-white
+               hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300
+               dark:bg-primary-600 dark:hover:bg-primary-700"
+      >
+        Seguir comprando
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

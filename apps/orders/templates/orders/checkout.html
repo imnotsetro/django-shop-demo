@@ -1,0 +1,435 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout — {{ product.name }} — ShopDemo{% endblock %}
+
+{% block content %}
+
+<section class="flex-1 bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
+  <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+
+    <!-- Stepper -->
+    <div class="px-6 py-4">
+    <ol class="items-center flex w-full max-w-2xl text-center text-sm font-medium text-gray-500 dark:text-gray-400 sm:text-base">
+      <li class="after:border-1 flex items-center text-primary-700 after:mx-6 after:hidden after:h-1 after:w-full after:border-b after:border-gray-200 dark:text-primary-500 dark:after:border-gray-700 sm:after:inline-block sm:after:content-[''] md:w-full xl:after:mx-10">
+        <span class="flex items-center after:mx-2 after:text-gray-200 after:content-['/'] dark:after:text-gray-500 sm:after:hidden">
+          <svg class="me-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          Cart
+        </span>
+      </li>
+
+      <li class="after:border-1 flex items-center text-primary-700 after:mx-6 after:hidden after:h-1 after:w-full after:border-b after:border-gray-200 dark:text-primary-500 dark:after:border-gray-700 sm:after:inline-block sm:after:content-[''] md:w-full xl:after:mx-10">
+        <span class="flex items-center after:mx-2 after:text-gray-200 after:content-['/'] dark:after:text-gray-500 sm:after:hidden">
+          <svg class="me-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          Checkout
+        </span>
+      </li>
+
+      <li class="flex shrink-0 items-center">
+        <svg class="me-2 h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        Order summary
+      </li>
+    </ol>
+    </div>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <!-- Valores fijos enviados al servidor -->
+      <input type="hidden" name="payment_method" value="credit_card">
+      <input type="hidden" name="delivery_method" value="andreani">
+
+      <div class="lg:flex lg:items-start lg:gap-12 xl:gap-30">
+
+        <!-- ── LEFT COLUMN — formulario ── -->
+        <div class="min-w-0 flex-1 space-y-8">
+
+          {# Errores globales #}
+          {% if form.non_field_errors %}
+            <div class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 dark:border-red-800 dark:bg-red-900/20">
+              <svg class="mt-0.5 h-5 w-5 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+              </svg>
+              <p class="text-sm text-red-700 dark:text-red-400">{{ form.non_field_errors|join:", " }}</p>
+            </div>
+          {% endif %}
+
+          <!-- Datos de entrega -->
+          <div class="space-y-4">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Datos de entrega</h2>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+              <!-- Nombre -->
+              <div>
+                <label for="{{ form.full_name.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  Nombre completo <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="{{ form.full_name.html_name }}"
+                  id="{{ form.full_name.id_for_label }}"
+                  value="{{ form.full_name.value|default:'' }}"
+                  placeholder="Juan Pérez"
+                  class="block w-full rounded-lg border p-2.5 text-sm text-gray-900 bg-gray-50
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400
+                         {% if form.full_name.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %}"
+                  required
+                >
+                {% if form.full_name.errors %}
+                  <p class="mt-1 text-xs text-red-600">{{ form.full_name.errors|join:", " }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Email -->
+              <div>
+                <label for="{{ form.email.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  Correo electrónico <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="{{ form.email.html_name }}"
+                  id="{{ form.email.id_for_label }}"
+                  value="{{ form.email.value|default:'' }}"
+                  placeholder="nombre@ejemplo.com"
+                  class="block w-full rounded-lg border p-2.5 text-sm text-gray-900 bg-gray-50
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400
+                         {% if form.email.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %}"
+                  required
+                >
+                {% if form.email.errors %}
+                  <p class="mt-1 text-xs text-red-600">{{ form.email.errors|join:", " }}</p>
+                {% endif %}
+              </div>
+
+              <!-- País -->
+              <div>
+                <label for="{{ form.country.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  País <span class="text-red-500">*</span>
+                </label>
+                <select
+                  name="{{ form.country.html_name }}"
+                  id="{{ form.country.id_for_label }}"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                >
+                  {% for val, label in form.country.field.choices %}
+                    <option value="{{ val }}" {% if form.country.value == val %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                {% if form.country.errors %}
+                  <p class="mt-1 text-xs text-red-600">{{ form.country.errors|join:", " }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Ciudad -->
+              <div>
+                <label for="{{ form.city.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  Ciudad <span class="text-red-500">*</span>
+                </label>
+                <select
+                  name="{{ form.city.html_name }}"
+                  id="{{ form.city.id_for_label }}"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                >
+                  {% for val, label in form.city.field.choices %}
+                    <option value="{{ val }}" {% if form.city.value == val %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                {% if form.city.errors %}
+                  <p class="mt-1 text-xs text-red-600">{{ form.city.errors|join:", " }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Teléfono -->
+              <div class="sm:col-span-2">
+                <label for="{{ form.phone.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  Teléfono
+                </label>
+                <input
+                  type="text"
+                  name="{{ form.phone.html_name }}"
+                  id="{{ form.phone.id_for_label }}"
+                  value="{{ form.phone.value|default:'' }}"
+                  placeholder="123-456-7890"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400
+                         {% if form.phone.errors %}border-red-500{% endif %}"
+                >
+                {% if form.phone.errors %}
+                  <p class="mt-1 text-xs text-red-600">{{ form.phone.errors|join:", " }}</p>
+                {% endif %}
+              </div>
+
+                            <!-- Entre calles -->
+              <div class="sm:col-span-2">
+                <label for="id_between_streets" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  Entre calles
+                </label>
+                <input
+                  type="text"
+                  name="between_streets"
+                  id="id_between_streets"
+                  value="{{ form.between_streets.value|default:'' }}"
+                  placeholder="Ej: Entre Av. Corrientes y Av. Santa Fe"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400"
+                >
+              </div>
+ 
+              <!-- Código postal -->
+              <div>
+                <label for="id_postal_code" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  Código postal <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="postal_code"
+                  id="id_postal_code"
+                  value="{{ form.postal_code.value|default:'' }}"
+                  placeholder="Ej: 1425"
+                  maxlength="10"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400
+                         {% if form.postal_code.errors %}border-red-500{% endif %}"
+                  required
+                >
+                {% if form.postal_code.errors %}
+                  <p class="mt-1 text-xs text-red-600">{{ form.postal_code.errors|join:", " }}</p>
+                {% endif %}
+              </div>
+ 
+              <!-- Número de casa / depto -->
+              <div>
+                <label for="id_house_number" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  Número / Depto <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="house_number"
+                  id="id_house_number"
+                  value="{{ form.house_number.value|default:'' }}"
+                  placeholder="Ej: 1234 o 3B"
+                  maxlength="20"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400
+                         {% if form.house_number.errors %}border-red-500{% endif %}"
+                  required
+                >
+                {% if form.house_number.errors %}
+                  <p class="mt-1 text-xs text-red-600">{{ form.house_number.errors|join:", " }}</p>
+                {% endif %}
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Datos de tarjeta (visible solo si payment = credit_card) -->
+          <div id="card-fields" class="space-y-4">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Datos de la tarjeta</h3>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+              <!-- Número -->
+              <div class="sm:col-span-2">
+                <label for="{{ form.card_number.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  Número de tarjeta
+                </label>
+                <input
+                  type="text"
+                  name="{{ form.card_number.html_name }}"
+                  id="{{ form.card_number.id_for_label }}"
+                  value="{{ form.card_number.value|default:'' }}"
+                  placeholder="1234 5678 9012 3456"
+                  maxlength="19"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400
+                         {% if form.card_number.errors %}border-red-500{% endif %}"
+                >
+                {% if form.card_number.errors %}
+                  <p class="mt-1 text-xs text-red-600">{{ form.card_number.errors|join:", " }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Nombre en la tarjeta -->
+              <div class="sm:col-span-2">
+                <label for="{{ form.card_holder.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  Nombre en la tarjeta
+                </label>
+                <input
+                  type="text"
+                  name="{{ form.card_holder.html_name }}"
+                  id="{{ form.card_holder.id_for_label }}"
+                  value="{{ form.card_holder.value|default:'' }}"
+                  placeholder="JUAN PEREZ"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400
+                         {% if form.card_holder.errors %}border-red-500{% endif %}"
+                >
+                {% if form.card_holder.errors %}
+                  <p class="mt-1 text-xs text-red-600">{{ form.card_holder.errors|join:", " }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Vencimiento -->
+              <div>
+                <label for="{{ form.card_expiry.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  Vencimiento
+                </label>
+                <input
+                  type="text"
+                  name="{{ form.card_expiry.html_name }}"
+                  id="{{ form.card_expiry.id_for_label }}"
+                  value="{{ form.card_expiry.value|default:'' }}"
+                  placeholder="MM/AA"
+                  maxlength="5"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400
+                         {% if form.card_expiry.errors %}border-red-500{% endif %}"
+                >
+                {% if form.card_expiry.errors %}
+                  <p class="mt-1 text-xs text-red-600">{{ form.card_expiry.errors|join:", " }}</p>
+                {% endif %}
+              </div>
+
+              <!-- CVV -->
+              <div>
+                <label for="{{ form.card_cvv.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                  CVV
+                </label>
+                <input
+                  type="text"
+                  name="{{ form.card_cvv.html_name }}"
+                  id="{{ form.card_cvv.id_for_label }}"
+                  value="{{ form.card_cvv.value|default:'' }}"
+                  placeholder="•••"
+                  maxlength="4"
+                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900
+                         focus:border-primary-500 focus:ring-primary-500
+                         dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400
+                         {% if form.card_cvv.errors %}border-red-500{% endif %}"
+                >
+                {% if form.card_cvv.errors %}
+                  <p class="mt-1 text-xs text-red-600">{{ form.card_cvv.errors|join:", " }}</p>
+                {% endif %}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ── RIGHT COLUMN — resumen del pedido ── -->
+        <div class="mt-8 w-full space-y-6 sm:mt-0 lg:max-w-xs xl:max-w-md">
+
+          <!-- Producto -->
+          <div class="rounded-2xl border border-gray-200 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800">
+            <h3 class="mb-4 text-base font-semibold text-gray-900 dark:text-white">Resumen del pedido</h3>
+
+            <div class="flex items-center gap-4 mb-4">
+              {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="h-16 w-16 rounded-lg object-contain border border-gray-200 bg-white dark:border-gray-600">
+              {% else %}
+                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
+                  <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16l4-4 4 4 4-6 4 6M3 8h.01M21 3H3a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1Z"/>
+                  </svg>
+                </div>
+              {% endif %}
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ product.name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Vendido por {{ product.owner }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Stock disponible: {{ product.stock }}</p>
+              </div>
+            </div>
+
+            <div class="-my-3 divide-y divide-gray-200 dark:divide-gray-700">
+              <dl class="flex items-center justify-between gap-4 py-3">
+                <dt class="text-sm text-gray-500 dark:text-gray-400">Subtotal</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-white">${{ product.price }}</dd>
+              </dl>
+              <dl class="flex items-center justify-between gap-4 py-3">
+                <dt class="text-sm text-gray-500 dark:text-gray-400">Impuestos</dt>
+                <dd class="text-sm font-medium text-gray-900 dark:text-white">$0</dd>
+              </dl>
+              <dl class="flex items-center justify-between gap-4 py-3">
+                <dt class="text-base font-bold text-gray-900 dark:text-white">Total</dt>
+                <dd class="text-base font-bold text-gray-900 dark:text-white">${{ product.price }}</dd>
+              </dl>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-3 text-sm font-semibold text-white
+                   hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300
+                   dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800
+                   transition-all duration-150 active:scale-95"
+          >
+            <svg class="me-2 h-5 w-5" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/>
+            </svg>
+            Confirmar compra
+          </button>
+
+          <a
+            href="{% url 'products:product_detail' product.pk %}"
+            class="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700
+                   hover:bg-gray-50 hover:text-primary-700 focus:outline-none focus:ring-4 focus:ring-gray-100
+                   dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          >
+            Cancelar
+          </a>
+
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  function toggleCardFields(paymentValue) {
+    const cardSection = document.getElementById('card-fields');
+    cardSection.style.display = paymentValue === 'credit_card' ? 'block' : 'none';
+  }
+
+  // Estado inicial al cargar la página
+  document.addEventListener('DOMContentLoaded', () => {
+    const selected = document.querySelector('input[name="payment_method"]:checked');
+    if (selected) toggleCardFields(selected.value);
+
+    // Formatear número de tarjeta con espacios cada 4 dígitos
+    const cardInput = document.getElementById('{{ form.card_number.id_for_label }}');
+    if (cardInput) {
+      cardInput.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/\D/g, '').substring(0, 16);
+        e.target.value = val.replace(/(.{4})/g, '$1 ').trim();
+      });
+    }
+
+    // Formatear vencimiento MM/AA
+    const expiryInput = document.getElementById('{{ form.card_expiry.id_for_label }}');
+    if (expiryInput) {
+      expiryInput.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/\D/g, '').substring(0, 4);
+        if (val.length >= 3) val = val.substring(0, 2) + '/' + val.substring(2);
+        e.target.value = val;
+      });
+    }
+  });
+</script>
+
+{% endblock %}

@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'apps.products',
     'apps.core',
     "apps.accounts",
+    "apps.orders",
 ]
 
 # ── Modelo de usuario personalizado ──────────────────────────────────────────
