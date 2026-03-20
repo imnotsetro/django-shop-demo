@@ -26,8 +26,8 @@ User = get_user_model()
 # ── Imágenes disponibles en media/demo/ ───────────────────────────────────────
 # Cada entrada: (filename_sin_extension, extension)
 DEMO_IMAGES = [
-    ("bicicleta1",  "jpg"),
-    ("bicicleta2",  "jpg"),
+    ("bicileta1",  "jpg"),
+    ("bicileta2",  "jpg"),
     ("bicicleta3", "jpg"),
     ("iphone",     "jpg"),
     ("licuadora",  "jpg"),
@@ -41,7 +41,7 @@ DEMO_IMAGES = [
 PRODUCT_TEMPLATES = [
     # ── Bicicletas ──
     {
-        "image": "bicicleta1",
+        "image": "bicileta1",
         "variants": [
             ("Bicicleta de Montaña TrailX Pro",      "Rodado 29, cuadro de aluminio, 21 velocidades Shimano. Ideal para senderos y terreno irregular."),
             ("Bicicleta MTB Summit 500",              "Suspensión delantera, frenos de disco hidráulicos, cuadro reforzado para máxima resistencia."),
@@ -52,7 +52,7 @@ PRODUCT_TEMPLATES = [
         ],
     },
     {
-        "image": "bicicleta2",
+        "image": "bicileta2",
         "variants": [
             ("Bicicleta de Ruta Velocity R10",       "Cuadro de carbono ultraliviano, 22 velocidades, ideal para ciclismo de competencia."),
             ("Bicicleta de Carretera AeroSpeed",     "Diseño aerodinámico, manubrio drop bar, transmisión Shimano 105 de 11 velocidades."),
@@ -133,13 +133,6 @@ PRODUCT_TEMPLATES = [
             ("Heladera Dos Puertas Patrick HP490BC", "493L, no frost, display externo, cielofreezer de 5 estrellas, Wi-Fi."),
         ],
     },
-]
-
-# ── Vendedores de prueba ───────────────────────────────────────────────────────
-SELLER_NAMES = [
-    "TechStore Argentina", "ElectroHogar", "BiciMundo", "MegaShop Online",
-    "ImportadoraX", "DirecTech", "HomeSmart", "GadgetHub", "VeloCity Store",
-    "ElectroMax", "SmartHome AR", "Mundo Digital",
 ]
 
 # ── Dominios de email para usuarios de prueba ─────────────────────────────────
@@ -262,6 +255,15 @@ class Command(BaseCommand):
     def _seed_products(self, n_products):
         self.stdout.write(self.style.HTTP_INFO(f"► Creando {n_products} productos..."))
 
+        # Obtener todos los usuarios disponibles para asignar como owner
+        users = list(User.objects.filter(is_staff=False, is_superuser=False))
+        if not users:
+            # Si no hay usuarios, usar el superusuario como fallback
+            users = list(User.objects.all())
+        if not users:
+            self.stdout.write(self.style.ERROR("   ✗ No hay usuarios para asignar como propietarios. Crea usuarios primero."))
+            return 0
+
         # Verificar que la carpeta media/demo existe
         demo_dir = Path("media/demo")
         if not demo_dir.exists():
@@ -294,7 +296,6 @@ class Command(BaseCommand):
         for i, (image_name, name, description) in enumerate(product_pool[:n_products], 1):
             price = Decimal(str(random.randint(5_000, 500_000)))
             stock = random.randint(0, 200)
-            seller = random.choice(SELLER_NAMES)
 
             image_field_value = self._resolve_image(demo_dir, image_name)
 
@@ -302,7 +303,7 @@ class Command(BaseCommand):
                 name=name,
                 description=description,
                 price=price,
-                owner=seller,
+                owner=random.choice(users),
                 stock=stock,
             )
 
@@ -315,7 +316,7 @@ class Command(BaseCommand):
             status_icon = "📦" if stock > 0 else "❌"
             self.stdout.write(
                 f"   [{created:>3}/{n_products}] "
-                + self.style.SUCCESS(f"{name[:45]:<45}")
+                + self.style.SUCCESS(f"{name[:40]:<40}")
                 + f"  ${price:>9,.0f}  stock:{stock:>3}  {status_icon}"
             )
 
