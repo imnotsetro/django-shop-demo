@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Mis productos — ShopDemo{% endblock %}
+
+{% block content %}
+
+{# ── Toast ── #}
+{% if messages %}
+  <div id="toast-container" class="fixed top-6 right-6 z-50 flex flex-col gap-3">
+    {% for message in messages %}
+      <div
+        id="toast-{{ forloop.counter }}"
+        class="toast-item flex items-center gap-4 rounded-xl border border-green-200 bg-white px-5 py-4 shadow-xl
+               ring-1 ring-green-100 dark:border-green-800 dark:bg-gray-800 dark:ring-green-900
+               translate-x-0 opacity-100 transition-all duration-500"
+        role="alert"
+      >
+        <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-green-100 dark:bg-green-900">
+          <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm font-semibold text-gray-900 dark:text-white">¡Éxito!</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{{ message }}</p>
+        </div>
+        <button type="button" onclick="dismissToast('toast-{{ forloop.counter }}')"
+          class="ml-auto flex-shrink-0 rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+          </svg>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<section class="flex-1 bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-12">
+  <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mis productos</h1>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Productos publicados por
+          <span class="font-medium text-gray-700 dark:text-gray-300">{{ request.user.get_full_name }}</span>
+          · <span class="font-medium text-gray-700 dark:text-gray-300">{{ paginator.count }}</span> en total
+        </p>
+      </div>
+      <a
+        href="{% url 'products:product_create' %}"
+        class="inline-flex items-center gap-2 rounded-lg bg-primary-700 px-4 py-2.5 text-sm font-medium text-white
+               hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300
+               dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5v14"/>
+        </svg>
+        Nuevo producto
+      </a>
+    </div>
+
+    {% if page_obj.object_list %}
+
+      <!-- Grid -->
+      <div class="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
+        {% for product in page_obj %}
+        <div class="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 flex flex-col">
+
+          <!-- Imagen -->
+          <div class="h-48 w-full overflow-hidden rounded-t-lg">
+            <a href="{% url 'products:product_detail' product.pk %}">
+              {% if product.image %}
+                <img class="h-full w-full object-contain" src="{{ product.image.url }}" alt="{{ product.name }}">
+              {% else %}
+                <div class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-700">
+                  <svg class="h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M3 16l4-4 4 4 4-6 4 6M3 8h.01M21 3H3a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1Z"/>
+                  </svg>
+                </div>
+              {% endif %}
+            </a>
+          </div>
+
+          <!-- Info -->
+          <div class="flex flex-col flex-1 p-5">
+            <div class="mb-3 flex items-center justify-between gap-2">
+              <span class="rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
+                Stock: {{ product.stock }}
+              </span>
+              {% if product.stock == 0 %}
+                <span class="rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                  Agotado
+                </span>
+              {% endif %}
+            </div>
+
+            <a href="{% url 'products:product_detail' product.pk %}"
+               class="text-base font-semibold text-gray-900 hover:underline dark:text-white line-clamp-2 mb-1">
+              {{ product.name }}
+            </a>
+
+            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-3 flex-1">{{ product.description }}</p>
+
+            <div class="flex items-center justify-between gap-2 mt-auto">
+              <p class="text-xl font-extrabold text-gray-900 dark:text-white">${{ product.price }}</p>
+              <div class="flex items-center gap-2">
+                <a href="{% url 'products:product_update' product.pk %}"
+                   class="inline-flex items-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700
+                          hover:bg-gray-50 hover:text-primary-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+                  Editar
+                </a>
+                <a href="{% url 'products:product_detail' product.pk %}"
+                   class="inline-flex items-center rounded-lg bg-primary-700 px-3 py-1.5 text-xs font-medium text-white
+                          hover:bg-primary-800 dark:bg-primary-600 dark:hover:bg-primary-700">
+                  Ver
+                </a>
+              </div>
+            </div>
+
+            <p class="mt-3 text-xs text-gray-400 dark:text-gray-500">
+              Publicado el {{ product.created_at|date:"d/m/Y" }}
+            </p>
+          </div>
+
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Paginación -->
+      {% if paginator.num_pages > 1 %}
+      <nav class="mt-8 flex items-center justify-between" aria-label="Paginación">
+        <p class="text-sm text-gray-700 dark:text-gray-400">
+          Mostrando
+          <span class="font-semibold text-gray-900 dark:text-white">{{ page_obj.start_index }}</span>
+          –
+          <span class="font-semibold text-gray-900 dark:text-white">{{ page_obj.end_index }}</span>
+          de
+          <span class="font-semibold text-gray-900 dark:text-white">{{ paginator.count }}</span>
+        </p>
+        <ul class="inline-flex -space-x-px text-sm">
+          <li>
+            {% if page_obj.has_previous %}
+              <a href="?page={{ page_obj.previous_page_number }}"
+                 class="flex h-8 items-center justify-center rounded-s-lg border border-gray-300 bg-white px-3 text-gray-500 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/>
+                </svg>
+              </a>
+            {% else %}
+              <span class="flex h-8 items-center justify-center rounded-s-lg border border-gray-300 bg-white px-3 text-gray-300 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-600">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/>
+                </svg>
+              </span>
+            {% endif %}
+          </li>
+          {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li><span class="flex h-8 items-center justify-center border border-gray-300 bg-primary-50 px-3 text-primary-600 dark:border-gray-700 dark:bg-gray-700 dark:text-white">{{ num }}</span></li>
+            {% elif num == 1 or num == paginator.num_pages or num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+              <li><a href="?page={{ num }}" class="flex h-8 items-center justify-center border border-gray-300 bg-white px-3 text-gray-500 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">{{ num }}</a></li>
+            {% endif %}
+          {% endfor %}
+          <li>
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}"
+                 class="flex h-8 items-center justify-center rounded-e-lg border border-gray-300 bg-white px-3 text-gray-500 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/>
+                </svg>
+              </a>
+            {% else %}
+              <span class="flex h-8 items-center justify-center rounded-e-lg border border-gray-300 bg-white px-3 text-gray-300 cursor-not-allowed dark:border-gray-700 dark:bg-gray-800 dark:text-gray-600">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/>
+                </svg>
+              </span>
+            {% endif %}
+          </li>
+        </ul>
+      </nav>
+      {% endif %}
+
+    {% else %}
+      <!-- Estado vacío -->
+      <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center dark:border-gray-600 dark:bg-gray-800">
+        <svg class="mb-4 h-16 w-16 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h10M16 16 20 20M20 16l-4 4"/>
+        </svg>
+        <h3 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white">Todavía no publicaste ningún producto</h3>
+        <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">Creá tu primer producto y aparecerá aquí.</p>
+        <a href="{% url 'products:product_create' %}"
+           class="inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white
+                  hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300
+                  dark:bg-primary-600 dark:hover:bg-primary-700">
+          Publicar primer producto
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<script>
+  function dismissToast(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(2rem)';
+    setTimeout(() => el.remove(), 500);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.toast-item').forEach((toast, i) => {
+      setTimeout(() => dismissToast(toast.id), 4000 + i * 300);
+    });
+  });
+</script>
+
+{% endblock %}
