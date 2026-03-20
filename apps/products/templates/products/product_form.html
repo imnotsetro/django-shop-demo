@@ -147,13 +147,25 @@
         <div class="sm:col-span-2">
           <p class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Propietario / Vendedor</p>
           <div class="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 dark:border-gray-600 dark:bg-gray-700">
-            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-bold shrink-0">
-              {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
-            </span>
-            <div>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">{{ request.user.get_full_name }}</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">{{ request.user.email }}</p>
-            </div>
+            {% if action == 'update' and product %}
+              {% with owner=product.owner %}
+              <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-bold shrink-0">
+                {{ owner.first_name|first|upper }}{{ owner.last_name|first|upper }}
+              </span>
+              <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ owner.get_full_name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ owner.email }}</p>
+              </div>
+              {% endwith %}
+            {% else %}
+              <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-bold shrink-0">
+                {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+              </span>
+              <div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ request.user.get_full_name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ request.user.email }}</p>
+              </div>
+            {% endif %}
           </div>
           <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">El producto quedará registrado a tu nombre.</p>
         </div>
