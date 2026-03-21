@@ -75,7 +75,7 @@
           {% if product.image %}
             <img
               class="mx-auto h-full w-full object-contain rounded-xl"
-              src="{{ product.image.url }}"
+              src="{{ product.image_url }}"
               alt="{{ product.name }}"
             />
           {% else %}
@@ -223,6 +223,9 @@
                 {{ review.author.get_full_name }}
               </dd>
               <dd class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ review.created_at|date:"d/m/Y" }}</dd>
+              {% if review.created_at != review.updated_at %}
+                <dd class="mt-0.5 text-xs text-gray-400 dark:text-gray-500 italic">Editada</dd>
+              {% endif %}
             </dl>
 
             <!-- Título + comentario -->

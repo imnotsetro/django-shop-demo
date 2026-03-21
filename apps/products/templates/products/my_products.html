@@ -72,7 +72,7 @@
           <div class="h-48 w-full overflow-hidden rounded-t-lg">
             <a href="{% url 'products:product_detail' product.pk %}">
               {% if product.image %}
-                <img class="h-full w-full object-contain" src="{{ product.image.url }}" alt="{{ product.name }}">
+                <img class="h-full w-full object-contain" src="{{ product.image_url }}" alt="{{ product.name }}">
               {% else %}
                 <div class="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-700">
                   <svg class="h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24">
@@ -188,8 +188,7 @@
       <!-- Estado vacío -->
       <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center dark:border-gray-600 dark:bg-gray-800">
         <svg class="mb-4 h-16 w-16 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 6h16M4 12h16M4 18h10M16 16 20 20M20 16l-4 4"/>
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 10V6a3 3 0 0 1 6 0v4m-8 0h10l1 9H8l1-9Z"/>
         </svg>
         <h3 class="mb-2 text-xl font-semibold text-gray-900 dark:text-white">Todavía no publicaste ningún producto</h3>
         <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">Creá tu primer producto y aparecerá aquí.</p>

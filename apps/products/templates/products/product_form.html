@@ -246,7 +246,7 @@
 
           {% if action == 'update' and product.image %}
             <div class="mb-3 flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 dark:border-gray-600 dark:bg-gray-700">
-              <img src="{{ product.image.url }}" alt="Imagen actual" class="h-12 w-12 rounded-md object-cover border border-gray-200 dark:border-gray-600">
+              <img src="{{ product.image_url }}" alt="Imagen actual" class="h-12 w-12 rounded-md object-cover border border-gray-200 dark:border-gray-600">
               <div>
                 <p class="text-xs font-medium text-gray-700 dark:text-gray-300">Imagen actual</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">Subí una nueva para reemplazarla.</p>
