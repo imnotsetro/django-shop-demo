@@ -38,12 +38,6 @@
           </svg>
         </button>
 
-        <!-- Cart dropdown (sin cambios) -->
-        <div id="myCartDropdown1" class="hidden z-10 mx-auto max-w-sm space-y-4 overflow-hidden rounded-lg bg-white p-4 antialiased shadow-lg dark:bg-gray-800">
-          <!-- ... items del carrito sin cambios ... -->
-          <a href="#" class="mb-2 me-2 inline-flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" role="button">Proceed to Checkout</a>
-        </div>
-
         <!-- ── Account button — dinámico según sesión ── -->
         {% if request.user.is_authenticated %}
 
