@@ -1,79 +1,486 @@
 {% extends "base.html" %}
 
-{% block title %}ShopDemo - Tu marketplace favorito{% endblock %}
+{% block title %}ShopDemo — Tu marketplace favorito{% endblock %}
 
 {% block content %}
 
-<section class="bg-white dark:bg-gray-900">
-    <div class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12">
-        <div class="mr-auto place-self-center lg:col-span-7">
-            <h1 class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">Comprá y vendé todo en un solo lugar</h1>
-            <p class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">Millones de productos con envío gratis, pagos seguros y la mejor experiencia de compra online. Encontrá lo que buscás al mejor precio.</p>
-            <a href="/products/" class="inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900">
-                Ver productos
-                <svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-            </a>
-            <a href="#" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
-                Publicá gratis
-            </a>
-        </div>
-        <div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
-            <img src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/hero/phone-mockup.png" alt="mockup">
-        </div>
-    </div>
-</section>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap');
 
-<section class="bg-white dark:bg-gray-900">
-  <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
-      <div class="max-w-screen-md mb-8 lg:mb-16">
-          <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Todo lo que necesitás para comprar y vender</h2>
-          <p class="text-gray-500 sm:text-xl dark:text-gray-400">En ShopDemo encontrás desde tecnología hasta ropa, hogar, deportes y mucho más. Con millones de vendedores y compradores, somos el marketplace más grande del país.</p>
+  .font-display { font-family: 'Syne', sans-serif; }
+  .font-body    { font-family: 'Inter', sans-serif; }
+
+  /* ── Gradiente animado del hero ── */
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .hero-gradient {
+    background: linear-gradient(-45deg, #0f172a, #1e3a5f, #0c4a6e, #164e63, #0f172a);
+    background-size: 400% 400%;
+    animation: gradientShift 12s ease infinite;
+  }
+
+  /* ── Partículas flotantes ── */
+  @keyframes floatUp {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+  }
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: floatUp linear infinite;
+    pointer-events: none;
+  }
+
+  /* ── Fade-in al hacer scroll ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Tarjeta producto con hover ── */
+  .product-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+  }
+
+  /* ── Glow en botón CTA ── */
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+    50%       { box-shadow: 0 0 0 12px rgba(14, 165, 233, 0); }
+  }
+  .btn-glow { animation: pulse-glow 2.5s ease-in-out infinite; }
+
+  /* ── Ticker de marcas ── */
+  @keyframes ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .ticker-track { animation: ticker 20s linear infinite; }
+  .ticker-track:hover { animation-play-state: paused; }
+
+  /* ── Número animado ── */
+  @keyframes countUp {
+    from { opacity: 0; transform: scale(0.8); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .stat-number { animation: countUp 0.8s ease forwards; }
+
+  /* ── Línea decorativa ── */
+  .line-accent {
+    background: linear-gradient(90deg, #0ea5e9, #6366f1);
+  }
+</style>
+
+<!-- ══════════════════════════════════════════════════════════
+     HERO PRINCIPAL
+═══════════════════════════════════════════════════════════════ -->
+<section class="hero-gradient relative overflow-hidden min-h-[92vh] flex items-center font-body">
+
+  <!-- Partículas decorativas -->
+  <div id="particles-container" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
+
+  <!-- Grid decorativo de fondo -->
+  <div class="absolute inset-0 opacity-10"
+    style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 60px 60px;">
+  </div>
+
+  <div class="relative z-10 mx-auto max-w-screen-xl px-4 py-24 2xl:px-0">
+    <div class="lg:grid lg:grid-cols-12 lg:gap-16 items-center">
+
+      <!-- Texto -->
+      <div class="lg:col-span-6 text-center lg:text-left">
+        <span class="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-400/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-sky-300 mb-6">
+          <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+          Marketplace del futuro
+        </span>
+
+        <h1 class="font-display text-5xl font-extrabold text-white leading-[1.1] mb-6 md:text-6xl xl:text-7xl">
+          Comprá y vendé<br>
+          <span class="text-white bg-clip-text"
+            style="background: linear-gradient(135deg, #38bdf8, #818cf8);">
+            todo en un lugar
+          </span>
+        </h1>
+
+        <p class="text-sky-100/70 text-lg mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+          Millones de productos, envío gratis y pagos 100% seguros. La experiencia de compra que siempre quisiste.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <a href="/products/"
+            class="btn-glow inline-flex items-center justify-center gap-2 rounded-xl bg-sky-500 px-8 py-4 text-base font-semibold text-white hover:bg-sky-400 transition-colors duration-200">
+            Explorar productos
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
+          {% if not request.user.is_authenticated %}
+          <a href="{% url 'accounts:register' %}"
+            class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-8 py-4 text-base font-semibold text-white hover:bg-white/20 transition-colors duration-200 backdrop-blur-sm">
+            Crear cuenta gratis
+          </a>
+          {% endif %}
+        </div>
+
+        <!-- Stats rápidos -->
+        <div class="mt-14 flex flex-wrap gap-8 justify-center lg:justify-start">
+          <div class="text-center lg:text-left">
+            <p class="font-display text-3xl font-bold text-white stat-number">100+</p>
+            <p class="text-sky-200/60 text-sm mt-0.5">Productos</p>
+          </div>
+          <div class="w-px bg-white/10 hidden sm:block"></div>
+          <div class="text-center lg:text-left">
+            <p class="font-display text-3xl font-bold text-white stat-number">50+</p>
+            <p class="text-sky-200/60 text-sm mt-0.5">Vendedores</p>
+          </div>
+          <div class="w-px bg-white/10 hidden sm:block"></div>
+          <div class="text-center lg:text-left">
+            <p class="font-display text-3xl font-bold text-white stat-number">24/7</p>
+            <p class="text-sky-200/60 text-sm mt-0.5">Soporte</p>
+          </div>
+        </div>
       </div>
-      <div class="space-y-8 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-12 md:space-y-0">
-          <div>
-              <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                  <svg class="w-5 h-5 text-primary-600 lg:w-6 lg:h-6 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-              </div>
-              <h3 class="mb-2 text-xl font-bold dark:text-white">Envío gratis</h3>
-              <p class="text-gray-500 dark:text-gray-400">Miles de productos con envío gratis a todo el país. Recibí tus compras en la puerta de tu casa en tiempo récord con nuestro servicio de logística.</p>
+
+      <!-- Visual derecho — tarjetas flotantes -->
+      <div class="hidden lg:block lg:col-span-6 relative h-[520px]">
+
+        <!-- Tarjeta principal -->
+        <div class="absolute top-8 left-8 right-8 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-2xl"
+          style="animation: float1 6s ease-in-out infinite;">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-white font-semibold text-sm">iPhone 15 Pro Max</p>
+              <p class="text-sky-200/60 text-xs">Tecnología · En stock</p>
+            </div>
+            <div class="ml-auto">
+              <span class="text-white font-bold text-lg">$389.000</span>
+            </div>
           </div>
-          <div>
-              <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                  <svg class="w-5 h-5 text-primary-600 lg:w-6 lg:h-6 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"></path></svg>
-              </div>
-              <h3 class="mb-2 text-xl font-bold dark:text-white">Pagos seguros</h3>
-              <p class="text-gray-500 dark:text-gray-400">Pagá con tarjeta, transferencia o efectivo. Tu dinero está protegido hasta que confirmes que recibiste tu compra en perfectas condiciones.</p>
+          <div class="w-full bg-white/10 rounded-full h-1.5 mb-1">
+            <div class="bg-gradient-to-r from-sky-400 to-indigo-500 h-1.5 rounded-full" style="width: 78%"></div>
           </div>
-          <div>
-              <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                  <svg class="w-5 h-5 text-primary-600 lg:w-6 lg:h-6 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path><path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"></path></svg>
-              </div>
-              <h3 class="mb-2 text-xl font-bold dark:text-white">Vendé fácil</h3>
-              <p class="text-gray-500 dark:text-gray-400">Publicá tus productos gratis en minutos y llegá a millones de compradores. Gestioná tus ventas, stock y envíos desde un solo panel.</p>
+          <p class="text-sky-200/50 text-xs">78 unidades vendidas este mes</p>
+        </div>
+
+        <!-- Tarjeta de review -->
+        <div class="absolute bottom-28 left-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-4 shadow-xl w-64"
+          style="animation: float2 7s ease-in-out infinite;">
+          <div class="flex items-center gap-1 mb-2">
+            {% for i in "12345" %}<svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M13.8 4.2a2 2 0 0 0-3.6 0L8.4 8.4l-4.6.3a2 2 0 0 0-1.1 3.5l3.5 3-1 4.4c-.5 1.7 1.4 3 2.9 2.1l3.9-2.3 3.9 2.3c1.5 1 3.4-.4 3-2.1l-1-4.4 3.4-3a2 2 0 0 0-1.1-3.5l-4.6-.3-1.8-4.2Z"/></svg>{% endfor %}
           </div>
-          <div>
-              <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                  <svg class="w-5 h-5 text-primary-600 lg:w-6 lg:h-6 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"></path><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"></path></svg>
-              </div>
-              <h3 class="mb-2 text-xl font-bold dark:text-white">Cuotas sin interés</h3>
-              <p class="text-gray-500 dark:text-gray-400">Comprá en hasta 12 cuotas sin interés con las principales tarjetas de crédito. Llevate lo que querés hoy y pagalo cómodamente cada mes.</p>
+          <p class="text-white/80 text-xs leading-relaxed">"Excelente producto, llegó en perfectas condiciones. ¡100% recomendable!"</p>
+          <div class="flex items-center gap-2 mt-3">
+            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">M</div>
+            <p class="text-sky-200/60 text-xs">Martina G.</p>
           </div>
-          <div>
-              <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                  <svg class="w-5 h-5 text-primary-600 lg:w-6 lg:h-6 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-              </div>
-              <h3 class="mb-2 text-xl font-bold dark:text-white">Compradores verificados</h3>
-              <p class="text-gray-500 dark:text-gray-400">Leé opiniones reales de otros compradores antes de decidir. Nuestro sistema de reputación te ayuda a elegir siempre los mejores vendedores.</p>
+        </div>
+
+        <!-- Tarjeta de entrega -->
+        <div class="absolute bottom-4 right-4 bg-emerald-500/20 backdrop-blur-md rounded-2xl border border-emerald-400/30 p-4 shadow-xl w-56"
+          style="animation: float3 8s ease-in-out infinite;">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/30 flex items-center justify-center">
+              <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11.917 9.724 16.5 19 7.5"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-emerald-300 font-semibold text-sm">Entrega confirmada</p>
+              <p class="text-emerald-200/60 text-xs">Andreani · 3-5 días hábiles</p>
+            </div>
           </div>
-          <div>
-              <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-primary-100 lg:h-12 lg:w-12 dark:bg-primary-900">
-                  <svg class="w-5 h-5 text-primary-600 lg:w-6 lg:h-6 dark:text-primary-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
-              </div>
-              <h3 class="mb-2 text-xl font-bold dark:text-white">Soporte 24/7</h3>
-              <p class="text-gray-500 dark:text-gray-400">Nuestro equipo de atención al cliente está disponible todos los días para ayudarte con cualquier consulta, reclamo o devolución que necesites.</p>
-          </div>
+        </div>
+
+        <style>
+          @keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+          @keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+          @keyframes float3 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        </style>
       </div>
+
+    </div>
+  </div>
+
+  <!-- Chevron animado abajo -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+    <svg class="w-6 h-6 text-white/40" fill="none" viewBox="0 0 24 24">
+      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/>
+    </svg>
   </div>
 </section>
+
+<!-- ══════════════════════════════════════════════════════════
+     TICKER DE CATEGORÍAS
+═══════════════════════════════════════════════════════════════ -->
+<div class="bg-slate-900 border-y border-white/10 py-4 overflow-hidden font-body">
+  <div class="ticker-track flex gap-12 whitespace-nowrap w-max">
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Tecnologia</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Electrodomesticos</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Bicicletas</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Smartphones</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Heladeras</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Licuadoras</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Microondas</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Accesorios</span>
+    <!-- Repetición para loop continuo -->
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Tecnologia</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Electrodomesticos</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Bicicletas</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Smartphones</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Heladeras</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Licuadoras</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Microondas</span>
+    <span class="text-sm font-medium text-white/40 uppercase tracking-widest flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block"></span>Accesorios</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     FEATURES — 3 COLUMNAS
+═══════════════════════════════════════════════════════════════ -->
+<section class="bg-slate-950 py-20 font-body reveal">
+  <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+
+    <div class="text-center mb-14 reveal">
+      <h2 class="font-display text-4xl font-extrabold text-white mb-4">Por qué elegirnos</h2>
+      <div class="mx-auto h-1 w-16 rounded-full line-accent mb-4"></div>
+      <p class="text-slate-400 max-w-xl mx-auto">Todo lo que necesitás para comprar con confianza y vender sin complicaciones.</p>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+      {% for feature in features_list %}{% endfor %}
+
+      <!-- Card 1 -->
+      <div class="reveal rounded-2xl border border-white/10 bg-white/5 p-7 group hover:border-sky-500/40 hover:bg-sky-500/5 transition-all duration-300">
+        <div class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/15 group-hover:bg-sky-500/25 transition-colors">
+          <svg class="w-6 h-6 text-sky-400" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h6l2 4m-8-4v8m0-8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v9h2m8 0H9m4 0h2m4 0h2v-4m0 0h-5m3.5 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-10 0a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-xl font-bold text-white mb-2">Envío a domicilio</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Recibí tus compras en la puerta de tu casa con Andreani. Seguimiento en tiempo real.</p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="reveal rounded-2xl border border-white/10 bg-white/5 p-7 group hover:border-indigo-500/40 hover:bg-indigo-500/5 transition-all duration-300" style="transition-delay: 0.1s">
+        <div class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/15 group-hover:bg-indigo-500/25 transition-colors">
+          <svg class="w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-xl font-bold text-white mb-2">Pagos seguros</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Tu dinero está protegido. Pagá con tarjeta de crédito o débito con total seguridad.</p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="reveal rounded-2xl border border-white/10 bg-white/5 p-7 group hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all duration-300" style="transition-delay: 0.2s">
+        <div class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/15 group-hover:bg-emerald-500/25 transition-colors">
+          <svg class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.8 4.2a2 2 0 0 0-3.6 0L8.4 8.4l-4.6.3a2 2 0 0 0-1.1 3.5l3.5 3-1 4.4c-.5 1.7 1.4 3 2.9 2.1l3.9-2.3 3.9 2.3c1.5 1 3.4-.4 3-2.1l-1-4.4 3.4-3a2 2 0 0 0-1.1-3.5l-4.6-.3-1.8-4.2Z"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-xl font-bold text-white mb-2">Reseñas verificadas</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Solo compradores reales pueden opinar. Leé experiencias auténticas antes de comprar.</p>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="reveal rounded-2xl border border-white/10 bg-white/5 p-7 group hover:border-pink-500/40 hover:bg-pink-500/5 transition-all duration-300" style="transition-delay: 0.05s">
+        <div class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-pink-500/15 group-hover:bg-pink-500/25 transition-colors">
+          <svg class="w-6 h-6 text-pink-400" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10V6a3 3 0 0 1 6 0v4m-8 0h10l1 9H8l1-9Z"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-xl font-bold text-white mb-2">Vendé fácil</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Publicá tus productos en minutos. Gestioná stock, ventas y pedidos desde un panel simple.</p>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="reveal rounded-2xl border border-white/10 bg-white/5 p-7 group hover:border-amber-500/40 hover:bg-amber-500/5 transition-all duration-300" style="transition-delay: 0.15s">
+        <div class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/15 group-hover:bg-amber-500/25 transition-colors">
+          <svg class="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8.5A5.5 5.5 0 0 1 7 6a5.478 5.478 0 0 1 10.78-1.153A4.5 4.5 0 0 1 17 13H5a4 4 0 0 1-2-7.43"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-xl font-bold text-white mb-2">Siempre disponible</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Comprá y vendé 24/7 desde cualquier dispositivo. La plataforma que nunca duerme.</p>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="reveal rounded-2xl border border-white/10 bg-white/5 p-7 group hover:border-violet-500/40 hover:bg-violet-500/5 transition-all duration-300" style="transition-delay: 0.25s">
+        <div class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-violet-500/15 group-hover:bg-violet-500/25 transition-colors">
+          <svg class="w-6 h-6 text-violet-400" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-xl font-bold text-white mb-2">Cuenta segura</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Tu cuenta con email y contraseña cifrada. Historial de compras y reseñas en un solo lugar.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     HERO SECUNDARIO — CTA VENDER
+═══════════════════════════════════════════════════════════════ -->
+<section class="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 py-24 font-body reveal">
+
+  <!-- Orb decorativo -->
+  <div class="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full opacity-20"
+    style="background: radial-gradient(circle, #6366f1, transparent 70%);"></div>
+  <div class="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full opacity-15"
+    style="background: radial-gradient(circle, #0ea5e9, transparent 70%);"></div>
+
+  <div class="relative z-10 mx-auto max-w-screen-xl px-4 2xl:px-0">
+    <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+
+      <!-- Texto izquierda -->
+      <div class="reveal">
+        <span class="inline-block rounded-full bg-indigo-500/20 border border-indigo-400/30 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-indigo-300 mb-5">
+          Para vendedores
+        </span>
+        <h2 class="font-display text-4xl font-extrabold text-white mb-5 leading-tight">
+          Convertí tus productos<br>en ingresos reales
+        </h2>
+        <p class="text-slate-300/70 text-lg mb-8 leading-relaxed">
+          Publicá gratis, llegá a compradores reales y gestioná todo desde tu panel. Sin comisiones ocultas.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          {% if request.user.is_authenticated %}
+          <a href="{% url 'products:product_create' %}"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-7 py-3.5 text-sm font-semibold text-white hover:bg-indigo-400 transition-colors">
+            Publicar producto
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          {% else %}
+          <a href="{% url 'accounts:register' %}"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-7 py-3.5 text-sm font-semibold text-white hover:bg-indigo-400 transition-colors">
+            Empezar gratis
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          {% endif %}
+          <a href="/products/"
+            class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 px-7 py-3.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+            Ver el catálogo
+          </a>
+        </div>
+      </div>
+
+      <!-- Pasos a la derecha -->
+      <div class="mt-12 lg:mt-0 space-y-5 reveal">
+        {% for step in "123" %}{% endfor %}
+
+        <div class="flex items-start gap-5 rounded-2xl border border-white/10 bg-white/5 p-5 hover:border-indigo-500/40 transition-colors">
+          <div class="shrink-0 w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 font-bold text-sm">1</div>
+          <div>
+            <p class="text-white font-semibold mb-1">Creá tu cuenta</p>
+            <p class="text-slate-400 text-sm">Registrate con tu email en menos de un minuto. Sin papelería.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-5 rounded-2xl border border-white/10 bg-white/5 p-5 hover:border-indigo-500/40 transition-colors">
+          <div class="shrink-0 w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 font-bold text-sm">2</div>
+          <div>
+            <p class="text-white font-semibold mb-1">Publicá tu producto</p>
+            <p class="text-slate-400 text-sm">Subí fotos, poné el precio y el stock. ¡Listo para vender!</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-5 rounded-2xl border border-white/10 bg-white/5 p-5 hover:border-indigo-500/40 transition-colors">
+          <div class="shrink-0 w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 font-bold text-sm">3</div>
+          <div>
+            <p class="text-white font-semibold mb-1">Recibí tus ventas</p>
+            <p class="text-slate-400 text-sm">Los compradores te encuentran, compran y vos cobrás. Así de fácil.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     CTA FINAL
+═══════════════════════════════════════════════════════════════ -->
+<section class="bg-slate-950 py-20 text-center font-body reveal">
+  <div class="mx-auto max-w-2xl px-4">
+    <h2 class="font-display text-4xl font-extrabold text-white mb-4">
+      ¿Listo para empezar?
+    </h2>
+    <p class="text-slate-400 text-lg mb-10">
+      Explorá el catálogo o creá tu cuenta y empezá a vender hoy mismo.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="/products/"
+        class="btn-glow inline-flex items-center justify-center gap-2 rounded-xl bg-sky-500 px-8 py-4 text-base font-semibold text-white hover:bg-sky-400 transition-colors">
+        Ver productos
+      </a>
+      {% if not request.user.is_authenticated %}
+      <a href="{% url 'accounts:register' %}"
+        class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-8 py-4 text-base font-semibold text-white hover:bg-white/10 transition-colors">
+        Crear cuenta gratis
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════════════════ -->
+<script>
+  // ── Partículas ──────────────────────────────────────────────────────────────
+  (function() {
+    const container = document.getElementById('particles-container');
+    if (!container) return;
+    const colors = ['#38bdf8', '#818cf8', '#34d399', '#fb7185', '#fbbf24'];
+    for (let i = 0; i < 25; i++) {
+      const p = document.createElement('div');
+      const size = Math.random() * 6 + 2;
+      p.className = 'particle';
+      Object.assign(p.style, {
+        width:  size + 'px',
+        height: size + 'px',
+        left:   Math.random() * 100 + '%',
+        top:    Math.random() * 100 + '%',
+        background: colors[Math.floor(Math.random() * colors.length)],
+        opacity: (Math.random() * 0.4 + 0.1).toString(),
+        animationDuration: (Math.random() * 20 + 15) + 's',
+        animationDelay: (Math.random() * 10) + 's',
+      });
+      container.appendChild(p);
+    }
+  })();
+
+  // ── Scroll reveal ──────────────────────────────────────────────────────────
+  (function() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  })();
+</script>
 
 {% endblock %}
