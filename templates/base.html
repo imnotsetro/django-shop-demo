@@ -5,7 +5,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}ShopDemo{% endblock %}</title>
-
   {% tailwind_css %}
 </head>
 
@@ -13,10 +12,112 @@
 
   {% include "header.html" %}
 
+  {% if messages %}
+    <div id="toast-container"
+         class="fixed top-20 right-4 z-[9999] flex flex-col gap-2 w-80 pointer-events-none">
+      {% for message in messages %}
+
+        {# Elegir paleta según el tag del mensaje #}
+        {% if message.tags == 'error' %}
+          {% with border="border-red-200 dark:border-red-800" ring="ring-red-100 dark:ring-red-900" icon_bg="bg-red-100 dark:bg-red-900/40" icon_color="text-red-600 dark:text-red-400" label="Error" %}
+            <div id="toast-{{ forloop.counter }}"
+                 class="toast-item pointer-events-auto flex items-start gap-3 rounded-xl border {{ border }} bg-white dark:bg-gray-800 px-4 py-3.5 shadow-lg ring-1 {{ ring }} opacity-100 translate-x-0 transition-all duration-500"
+                 role="alert">
+              <div class="mt-0.5 shrink-0 flex h-8 w-8 items-center justify-center rounded-full {{ icon_bg }}">
+                <svg class="h-4 w-4 {{ icon_color }}" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ label }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{{ message }}</p>
+              </div>
+              <button onclick="dismissToast('toast-{{ forloop.counter }}')"
+                      class="mt-0.5 shrink-0 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-white transition-colors"
+                      aria-label="Cerrar">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 14 14">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+              </button>
+            </div>
+          {% endwith %}
+
+        {% elif message.tags == 'warning' %}
+          {% with border="border-amber-200 dark:border-amber-800" ring="ring-amber-100 dark:ring-amber-900" icon_bg="bg-amber-100 dark:bg-amber-900/40" icon_color="text-amber-600 dark:text-amber-400" label="Atención" %}
+            <div id="toast-{{ forloop.counter }}"
+                 class="toast-item pointer-events-auto flex items-start gap-3 rounded-xl border {{ border }} bg-white dark:bg-gray-800 px-4 py-3.5 shadow-lg ring-1 {{ ring }} opacity-100 translate-x-0 transition-all duration-500"
+                 role="alert">
+              <div class="mt-0.5 shrink-0 flex h-8 w-8 items-center justify-center rounded-full {{ icon_bg }}">
+                <svg class="h-4 w-4 {{ icon_color }}" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ label }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{{ message }}</p>
+              </div>
+              <button onclick="dismissToast('toast-{{ forloop.counter }}')"
+                      class="mt-0.5 shrink-0 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-white transition-colors"
+                      aria-label="Cerrar">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 14 14">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+              </button>
+            </div>
+          {% endwith %}
+
+        {% else %}
+          {# success / info — verde por defecto #}
+          {% with border="border-green-200 dark:border-green-800" ring="ring-green-100 dark:ring-green-900" icon_bg="bg-green-100 dark:bg-green-900/40" icon_color="text-green-600 dark:text-green-400" label="¡Listo!" %}
+            <div id="toast-{{ forloop.counter }}"
+                 class="toast-item pointer-events-auto flex items-start gap-3 rounded-xl border {{ border }} bg-white dark:bg-gray-800 px-4 py-3.5 shadow-lg ring-1 {{ ring }} opacity-100 translate-x-0 transition-all duration-500"
+                 role="alert">
+              <div class="mt-0.5 shrink-0 flex h-8 w-8 items-center justify-center rounded-full {{ icon_bg }}">
+                <svg class="h-4 w-4 {{ icon_color }}" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ label }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{{ message }}</p>
+              </div>
+              <button onclick="dismissToast('toast-{{ forloop.counter }}')"
+                      class="mt-0.5 shrink-0 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-white transition-colors"
+                      aria-label="Cerrar">
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 14 14">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+              </button>
+            </div>
+          {% endwith %}
+        {% endif %}
+
+      {% endfor %}
+    </div>
+  {% endif %}
+
   {% block content %}{% endblock %}
 
   {% include "footer.html" %}
 
   <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+
+  <script>
+    function dismissToast(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(1.5rem)';
+      setTimeout(() => el.remove(), 450);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.toast-item').forEach((toast, i) => {
+        setTimeout(() => dismissToast(toast.id), 5000 + i * 400);
+      });
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+
 </body>
 </html>
