@@ -25,6 +25,7 @@ urlpatterns = [
     path("", include("apps.core.urls", namespace="core")),
     path("products/", include("apps.products.urls", namespace="products")),
     path("orders/",   include("apps.orders.urls",   namespace="orders")),
+    path("reviews/", include("apps.reviews.urls", namespace="reviews")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

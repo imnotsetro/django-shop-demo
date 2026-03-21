@@ -38,18 +38,59 @@ def product_list(request):
 def product_detail(request, pk):
     """
     Vista pública de detalle de un producto.
-    Pasa 'can_edit' al template para mostrar/ocultar botones de editar/eliminar.
+    Incluye reseñas, promedio de calificación y contexto de permisos.
     Template: products/product_detail.html
     Contexto:
-        - product  → instancia del producto (con owner cargado)
-        - can_edit → bool — True si el usuario puede editar/eliminar
+        - product        → instancia del producto
+        - can_edit       → bool — puede editar/eliminar el producto
+        - reviews        → QuerySet de reseñas del producto
+        - user_review    → reseña del usuario actual (o None)
+        - can_review     → bool — puede escribir una reseña
+        - avg_rating     → promedio redondeado a 1 decimal (o None)
+        - avg_stars_filled / avg_stars_empty → rangos para estrellas
     """
+    from apps.reviews.models import Review
+    from apps.reviews.utils import user_has_purchased
+
     product = get_object_or_404(Product.objects.select_related("owner"), pk=pk)
     can_edit = user_can_edit_product(request.user, product)
 
+    reviews = (
+        Review.objects
+        .filter(product=product)
+        .select_related("author")
+        .order_by("-created_at")
+    )
+
+    # Reseña del usuario actual
+    user_review = None
+    can_review = False
+    if request.user.is_authenticated:
+        user_review = reviews.filter(author=request.user).first()
+        if user_review is None:
+            can_review = user_has_purchased(request.user, product)
+
+    # Promedio de calificación
+    avg_rating = None
+    avg_stars_filled = range(0)
+    avg_stars_empty = range(5)
+    if reviews.exists():
+        total = sum(r.rating for r in reviews)
+        avg_raw = total / reviews.count()
+        avg_rating = round(avg_raw, 1)
+        avg_rounded = round(avg_raw)
+        avg_stars_filled = range(1, avg_rounded + 1)
+        avg_stars_empty  = range(avg_rounded + 1, 6)
+
     return render(request, "products/product_detail.html", {
-        "product":  product,
-        "can_edit": can_edit,
+        "product":          product,
+        "can_edit":         can_edit,
+        "reviews":          reviews,
+        "user_review":      user_review,
+        "can_review":       can_review,
+        "avg_rating":       avg_rating,
+        "avg_stars_filled": avg_stars_filled,
+        "avg_stars_empty":  avg_stars_empty,
     })
 
 

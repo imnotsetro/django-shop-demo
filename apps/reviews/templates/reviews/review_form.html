@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if action == 'create' %}Escribir reseña{% else %}Editar reseña{% endif %} — {{ product.name }} — ShopDemo
+{% endblock %}
+
+{% block content %}
+
+<section class="flex-1 bg-white py-8 antialiased dark:bg-gray-900 md:py-12">
+  <div class="mx-auto max-w-2xl px-4 2xl:px-0">
+
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-2">
+        <li>
+          <a href="{% url 'products:product_list' %}" class="hover:text-primary-700 transition-colors">Productos</a>
+        </li>
+        <li class="flex items-center">
+          <svg class="w-3 h-3 mx-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+          <a href="{% url 'products:product_detail' product.pk %}" class="hover:text-primary-700 transition-colors truncate max-w-xs">{{ product.name }}</a>
+        </li>
+        <li class="flex items-center">
+          <svg class="w-3 h-3 mx-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+          <span class="text-gray-700 dark:text-gray-300 font-medium">
+            {% if action == 'create' %}Escribir reseña{% else %}Editar reseña{% endif %}
+          </span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="mb-7">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {% if action == 'create' %}Escribir una reseña{% else %}Editar tu reseña{% endif %}
+      </h1>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        Sobre: <span class="font-medium text-gray-700 dark:text-gray-300">{{ product.name }}</span>
+      </p>
+    </div>
+
+    <!-- Card -->
+    <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 overflow-hidden">
+      <div class="h-1 w-full bg-gradient-to-r from-primary-500 to-primary-700"></div>
+
+      <div class="p-6 md:p-8">
+
+        {% if form.non_field_errors %}
+          <div class="mb-5 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 dark:border-red-800 dark:bg-red-900/20">
+            <svg class="mt-0.5 h-5 w-5 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
+            </svg>
+            <p class="text-sm text-red-700 dark:text-red-400">{{ form.non_field_errors|join:", " }}</p>
+          </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <!-- Rating con estrellas interactivas -->
+          <div class="mb-6">
+            <p class="mb-3 text-sm font-medium text-gray-900 dark:text-white">
+              Calificación <span class="text-red-500">*</span>
+            </p>
+            <div class="flex items-center gap-1" id="star-rating">
+              {% for value, label in form.rating.field.choices reversed %}
+                <label
+                  for="star_{{ value }}"
+                  class="cursor-pointer"
+                  title="{{ label }}"
+                >
+                  <input
+                    type="radio"
+                    name="{{ form.rating.html_name }}"
+                    id="star_{{ value }}"
+                    value="{{ value }}"
+                    class="sr-only"
+                    {% if form.rating.value == value|stringformat:"s" %}checked{% endif %}
+                  >
+                  <svg
+                    data-star="{{ value }}"
+                    class="star-icon w-8 h-8 transition-colors duration-150
+                           {% if form.rating.value == value|stringformat:"s" %}text-yellow-400{% else %}text-gray-300 dark:text-gray-500{% endif %}"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M13.8 4.2a2 2 0 0 0-3.6 0L8.4 8.4l-4.6.3a2 2 0 0 0-1.1 3.5l3.5 3-1 4.4c-.5 1.7 1.4 3 2.9 2.1l3.9-2.3 3.9 2.3c1.5 1 3.4-.4 3-2.1l-1-4.4 3.4-3a2 2 0 0 0-1.1-3.5l-4.6-.3-1.8-4.2Z"/>
+                  </svg>
+                </label>
+              {% endfor %}
+            </div>
+            {% if form.rating.errors %}
+              <p class="mt-1.5 text-xs text-red-600 dark:text-red-400">{{ form.rating.errors|join:", " }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Título -->
+          <div class="mb-5">
+            <label for="{{ form.title.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+              Título <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="{{ form.title.html_name }}"
+              id="{{ form.title.id_for_label }}"
+              value="{{ form.title.value|default:'' }}"
+              placeholder="Resume tu experiencia en una frase"
+              class="block w-full rounded-lg border p-2.5 text-sm text-gray-900 bg-gray-50
+                     focus:border-primary-600 focus:ring-primary-600
+                     dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400
+                     {% if form.title.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %}"
+            >
+            {% if form.title.errors %}
+              <p class="mt-1.5 text-xs text-red-600 dark:text-red-400">{{ form.title.errors|join:", " }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Comentario -->
+          <div class="mb-6">
+            <label for="{{ form.body.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+              Comentario <span class="text-red-500">*</span>
+            </label>
+            <textarea
+              name="{{ form.body.html_name }}"
+              id="{{ form.body.id_for_label }}"
+              rows="5"
+              placeholder="Contá tu experiencia con el producto..."
+              class="block w-full rounded-lg border p-2.5 text-sm text-gray-900 bg-gray-50
+                     focus:border-primary-500 focus:ring-primary-500
+                     dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400
+                     {% if form.body.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %}"
+            >{{ form.body.value|default:'' }}</textarea>
+            {% if form.body.errors %}
+              <p class="mt-1.5 text-xs text-red-600 dark:text-red-400">{{ form.body.errors|join:", " }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Botones -->
+          <div class="flex items-center gap-3 border-t border-gray-200 dark:border-gray-700 pt-5">
+            <button
+              type="submit"
+              class="inline-flex items-center gap-2 rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-semibold text-white
+                     hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300
+                     dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800
+                     transition-all duration-150 active:scale-95"
+            >
+              {% if action == 'create' %}Publicar reseña{% else %}Guardar cambios{% endif %}
+            </button>
+            <a
+              href="{% url 'products:product_detail' product.pk %}"
+              class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700
+                     hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-100
+                     dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            >
+              Cancelar
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const stars = document.querySelectorAll('.star-icon');
+    const inputs = document.querySelectorAll('input[name="{{ form.rating.html_name }}"]');
+
+    function highlight(upTo) {
+      stars.forEach(s => {
+        const v = parseInt(s.dataset.star);
+        s.classList.toggle('text-yellow-400', v <= upTo);
+        s.classList.toggle('text-gray-300',   v > upTo);
+        s.classList.toggle('dark:text-gray-500', v > upTo);
+      });
+    }
+
+    // Hover
+    stars.forEach(s => {
+      s.addEventListener('mouseenter', () => highlight(parseInt(s.dataset.star)));
+      s.addEventListener('mouseleave', () => {
+        const checked = document.querySelector('input[name="{{ form.rating.html_name }}"]:checked');
+        highlight(checked ? parseInt(checked.value) : 0);
+      });
+      // Click — activar el radio correspondiente
+      s.addEventListener('click', () => {
+        const v = s.dataset.star;
+        const input = document.getElementById('star_' + v);
+        if (input) { input.checked = true; highlight(parseInt(v)); }
+      });
+    });
+
+    // Estado inicial
+    const checked = document.querySelector('input[name="{{ form.rating.html_name }}"]:checked');
+    if (checked) highlight(parseInt(checked.value));
+  });
+</script>
+
+{% endblock %}
