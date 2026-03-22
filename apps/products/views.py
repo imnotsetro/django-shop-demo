@@ -15,21 +15,27 @@ PRODUCTS_PER_PAGE = 8
 
 def product_list(request):
     """
-    Vista pública de lista de productos con paginación.
+    Vista pública de lista de productos con paginación y búsqueda por nombre.
     Template: products/product_list.html
     Contexto:
         - page_obj   → Page actual
         - paginator  → Objeto Paginator
+        - query      → Término de búsqueda actual (str o vacío)
     """
+    query = request.GET.get("q", "").strip()
     queryset = Product.objects.select_related("owner").all()
-    paginator = Paginator(queryset, PRODUCTS_PER_PAGE)
 
+    if query:
+        queryset = queryset.filter(name__icontains=query)
+
+    paginator = Paginator(queryset, PRODUCTS_PER_PAGE)
     page_number = request.GET.get("page", 1)
     page_obj = paginator.get_page(page_number)
 
     return render(request, "products/product_list.html", {
         "page_obj":  page_obj,
         "paginator": paginator,
+        "query":     query,
     })
 
 
