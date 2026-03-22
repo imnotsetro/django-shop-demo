@@ -7,9 +7,13 @@ Un marketplace e-commerce completo construido con **Django 6**, **Tailwind CSS**
 ✨ Funcionalidades
 
 🛍️ Productos — listado con búsqueda, detalle, CRUD con permisos por propietario
+
 🔐 Autenticación — registro/login por email, perfil de usuario, rol administrador
+
 🛒 Checkout — formulario de entrega y pago, historial de órdenes por usuario
+
 ⭐ Reseñas — solo compradores verificados pueden reseñar, una por producto, con calificación de estrellas
+
 🗃️ Seed de demo — comando seed_db que genera 100 productos, usuarios y reseñas de ejemplo
 
 ---
